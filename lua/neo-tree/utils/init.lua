@@ -1196,4 +1196,13 @@ M.brace_expand = function(s)
   return result
 end
 
+M.truncate_text = function(text, max_length)
+  local length = max_length
+  while vim.api.nvim_strwidth(text) > max_length do
+    text = vim.fn.strcharpart(text, 0, length)
+    length = length - 1
+  end
+  return text
+end
+
 return M
