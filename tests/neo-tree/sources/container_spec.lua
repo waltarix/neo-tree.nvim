@@ -136,7 +136,7 @@ describe("sources/components/container", function()
         local lines = vim.api.nvim_buf_get_lines(0, 1, -1, false)
         for _, line in ipairs(lines) do
           line = vim.fn.trim(line, " ", 2)
-          assert.equals(width, vim.fn.strchars(line))
+          assert.equals(width, vim.api.nvim_strwidth(line))
         end
       end)
     end
