@@ -427,16 +427,9 @@ local prepare_node = function(item, state)
     if component_data then
       for _, data in ipairs(component_data) do
         if data.text then
-          local padding = ""
-          if should_pad and #data.text and data.text:sub(1, 1) ~= " " and not data.no_padding then
-            padding = " "
-          end
-          data.text = padding .. data.text
-          should_pad = data.text:sub(#data.text) ~= " " and not data.no_next_padding
-
           actual_width = actual_width + vim.api.nvim_strwidth(data.text)
           line:append(data.text, data.highlight)
-          remaining_cols = remaining_cols - vim.fn.strchars(data.text)
+          remaining_cols = remaining_cols - vim.api.nvim_strwidth(data.text)
         end
       end
     end
