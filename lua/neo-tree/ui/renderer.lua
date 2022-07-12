@@ -373,7 +373,7 @@ local prepare_node = function(item, state)
           if data.text then
             actual_width = actual_width + vim.api.nvim_strwidth(data.text)
             line:append(data.text, data.highlight)
-            remaining_cols = remaining_cols - vim.fn.strchars(data.text)
+            remaining_cols = remaining_cols - vim.api.nvim_strwidth(data.text)
           end
         end
       end
