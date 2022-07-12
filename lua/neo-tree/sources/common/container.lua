@@ -10,7 +10,7 @@ local calc_rendered_width = function(rendered_item)
 
   for _, item in ipairs(rendered_item) do
     if item.text then
-      width = width + vim.fn.strchars(item.text)
+      width = width + vim.api.nvim_strwidth(item.text)
     end
   end
 
@@ -49,22 +49,10 @@ local calc_container_width = function(config, node, state, context)
 end
 
 local render_content = function(config, node, state, context)
-  local add_padding = function(rendered_item, should_pad)
-    for _, data in ipairs(rendered_item) do
-      if data.text then
-        local padding = (should_pad and #data.text and data.text:sub(1, 1) ~= " ") and " " or ""
-        data.text = padding .. data.text
-        should_pad = data.text:sub(#data.text) ~= " "
-      end
-    end
-    return should_pad
-  end
-
   local max_width = 0
   local grouped_by_zindex = utils.group_by(config.content, "zindex")
 
   for zindex, items in pairs(grouped_by_zindex) do
-    local should_pad = { left = false, right = false }
     local zindex_rendered = { left = {}, right = {} }
     local rendered_width = 0
 
@@ -72,7 +60,6 @@ local render_content = function(config, node, state, context)
       local rendered_item = renderer.render_component(item, node, state, context.available_width)
       if rendered_item then
         local align = item.align or "left"
-        should_pad[align] = add_padding(rendered_item, should_pad[align])
 
         vim.list_extend(zindex_rendered[align], rendered_item)
         rendered_width = rendered_width + calc_rendered_width(rendered_item)
@@ -100,7 +87,7 @@ local truncate_layer_keep_left = function(layer, skip_count, max_length)
     local remaining_to_skip = skip_count - skipped
     if remaining_to_skip > 0 then
       if #item.text <= remaining_to_skip then
-        skipped = skipped + vim.fn.strchars(item.text)
+        skipped = skipped + vim.api.nvim_strwidth(item.text)
         item.text = ""
       else
         item.text = item.text:sub(remaining_to_skip)
@@ -112,11 +99,11 @@ local truncate_layer_keep_left = function(layer, skip_count, max_length)
         skipped = skipped + remaining_to_skip
       end
     elseif taken <= max_length then
-      if #item.text + taken > max_length then
-        item.text = item.text:sub(1, max_length - taken)
+      if vim.api.nvim_strwidth(item.text) + taken > max_length then
+        item.text = utils.truncate_text(item.text, max_length - taken)
       end
       table.insert(result, item)
-      taken = taken + vim.fn.strchars(item.text)
+      taken = taken + vim.api.nvim_strwidth(item.text)
     end
   end
   return result
@@ -134,7 +121,7 @@ local truncate_layer_keep_right = function(layer, skip_count, max_length)
   while i > 0 do
     local item = layer[i]
     i = i - 1
-    local text_length = vim.fn.strchars(item.text)
+    local text_length = vim.api.nvim_strwidth(item.text)
     local remaining_to_skip = skip_count - skipped
     if remaining_to_skip > 0 then
       if text_length <= remaining_to_skip then
@@ -142,10 +129,10 @@ local truncate_layer_keep_right = function(layer, skip_count, max_length)
         item.text = ""
       else
         item.text = vim.fn.strcharpart(item.text, 0, text_length - remaining_to_skip)
-        text_length = vim.fn.strchars(item.text)
+        text_length = vim.api.nvim_strwidth(item.text)
         if text_length + taken > max_length then
           item.text = vim.fn.strcharpart(item.text, text_length - (max_length - taken))
-          text_length = vim.fn.strchars(item.text)
+          text_length = vim.api.nvim_strwidth(item.text)
         end
         table.insert(result, item)
         taken = taken + text_length
@@ -154,7 +141,7 @@ local truncate_layer_keep_right = function(layer, skip_count, max_length)
     elseif taken <= max_length then
       if text_length + taken > max_length then
         item.text = vim.fn.strcharpart(item.text, text_length - (max_length - taken))
-        text_length = vim.fn.strchars(item.text)
+        text_length = vim.api.nvim_strwidth(item.text)
       end
       table.insert(result, item)
       taken = taken + text_length
