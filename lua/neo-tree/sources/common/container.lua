@@ -10,7 +10,7 @@ local calc_rendered_width = function(rendered_item)
 
   for _, item in ipairs(rendered_item) do
     if item.text then
-      width = width + vim.fn.strchars(item.text)
+      width = width + vim.fn.strdisplaywidth(item.text)
     end
   end
 
@@ -83,7 +83,7 @@ local truncate_layer_keep_left = function(layer, skip_count, max_length)
     local remaining_to_skip = skip_count - skipped
     if remaining_to_skip > 0 then
       if #item.text <= remaining_to_skip then
-        skipped = skipped + vim.fn.strchars(item.text)
+        skipped = skipped + vim.fn.strdisplaywidth(item.text)
         item.text = ""
       else
         item.text = item.text:sub(remaining_to_skip)
@@ -99,7 +99,7 @@ local truncate_layer_keep_left = function(layer, skip_count, max_length)
         item.text = item.text:sub(1, max_length - taken)
       end
       table.insert(result, item)
-      taken = taken + vim.fn.strchars(item.text)
+      taken = taken + vim.fn.strdisplaywidth(item.text)
     end
   end
   return result
@@ -117,7 +117,7 @@ local truncate_layer_keep_right = function(layer, skip_count, max_length)
   while i > 0 do
     local item = layer[i]
     i = i - 1
-    local text_length = vim.fn.strchars(item.text)
+    local text_length = vim.fn.strdisplaywidth(item.text)
     local remaining_to_skip = skip_count - skipped
     if remaining_to_skip > 0 then
       if #item.text <= remaining_to_skip then
@@ -187,7 +187,7 @@ local merge_content = function(context)
   -- * Repeat until all layers have been merged.
   -- * Join the left and right tables together and return.
   --
-  local remaining_width = context.container_width - 2 -- I don't know why I need to subtract 2
+  local remaining_width = context.container_width
   local left, right = {}, {}
   local left_width, right_width = 0, 0
 
