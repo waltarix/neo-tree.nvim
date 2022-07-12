@@ -92,7 +92,6 @@ local follow_internal = function(callback, force_show, async)
 
   state.position.is.restorable = false -- we will handle setting cursor position here
   fs_scan.get_items(state, nil, path_to_reveal, function()
-    show_only_explicitly_opened()
     renderer.focus_node(state, path_to_reveal, true)
     if type(callback) == "function" then
       callback()
