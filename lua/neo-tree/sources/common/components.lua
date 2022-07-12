@@ -19,7 +19,7 @@ local log = require("neo-tree.log")
 local M = {}
 
 local make_two_char = function(symbol)
-  if vim.fn.strchars(symbol) == 1 then
+  if vim.fn.strdisplaywidth(symbol) == 1 then
     return symbol .. " "
   else
     return symbol

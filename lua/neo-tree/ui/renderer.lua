@@ -326,7 +326,7 @@ local prepare_node = function(item, state)
         for _, data in ipairs(component_data) do
           if data.text then
             line:append(data.text, data.highlight)
-            remaining_cols = remaining_cols - vim.fn.strchars(data.text)
+            remaining_cols = remaining_cols - vim.fn.strdisplaywidth(data.text)
           end
         end
       end
